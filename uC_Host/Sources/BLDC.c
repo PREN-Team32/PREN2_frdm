@@ -25,6 +25,7 @@
 #include "LED_green.h"
 #include "LED_blue.h"
 #include "Error.h"
+#include "SM1.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -35,7 +36,6 @@ static void BLDC_set_enable(bool status);
 static void BLDC_set_rpm(int rpm);
 static int get_pwm_ratio(int rpm);
 static void BLDC_reset(void);
-static void BLDC_init(const CLS1_StdIOType *io);
 
 static int BLDC_enable = 0;
 static int BLDC_rpm = 0;
@@ -107,15 +107,24 @@ byte BLDC_ParseCommand(const unsigned char *cmd,
 		return PrintStatus(io);
 	} else if (UTIL1_strcmp((char*)cmd, "BLDC on") == 0) {
 		*handled = TRUE;
-		BLDC_set_enable(1);
+		(void) SM1_SendChar(0x10);
 		return ERR_OK;
 	} else if (UTIL1_strcmp((char*)cmd, "BLDC off") == 0) {
 		*handled = TRUE;
-		BLDC_set_enable(0);
+		(void) SM1_SendChar(0x20);
 		return ERR_OK;
-	} else if (UTIL1_strcmp((char*)cmd, "BLDC reset") == 0) {
+	} else if (UTIL1_strcmp((char*)cmd, "debug") == 0) {
+		SM1_TComData tmp;
 		*handled = TRUE;
-		BLDC_reset();
+		(void) SM1_SendChar(0x71);
+		(void) SM1_SendChar(0x00);
+		(void) SM1_RecvChar(&tmp);
+		set_status(STATUS_ERROR);
+
+		return ERR_OK;
+	}else if (UTIL1_strcmp((char*)cmd, "BLDC reset") == 0) {
+		*handled = TRUE;
+		set_status(STATUS_OK);
 	} else if (UTIL1_strncmp((char*)cmd, "BLDC setrpm ",
 				 sizeof("BLDC setrpm")-1) == 0) {
 		if (!BLDC_enable) {
@@ -138,7 +147,6 @@ byte BLDC_ParseCommand(const unsigned char *cmd,
 		}
 	} else if (UTIL1_strcmp((char*)cmd, "BLDC init") == 0) {
 		*handled = TRUE;
-		BLDC_init(io);
 	}
 	return ERR_OK;
 }
@@ -170,24 +178,6 @@ static void BLDC_set_rpm(int rpm)
 	BLDC_PWM_ratio = get_pwm_ratio(rpm);
 }
 
-static void BLDC_init(const CLS1_StdIOType *io)
-{
-	int i = 0;
-
-	set_status(STATUS_BUSY);
-
-	CLS1_SendStr((unsigned char*)"initializing BLDC ...\r\n", io->stdOut);
-	for (i = 0; i < 1.5*BLDC_RPM_MAX; i+=100) {
-		WAIT1_Waitms(10);
-		BLDC_PWM_ratio = get_pwm_ratio(i) - BLDC_PWM_MIN;
-	}
-
-	BLDC_PWM_ratio = get_pwm_ratio(BLDC_RPM_MIN);
-
-	set_status(STATUS_OK);
-
-	BLDC_reset();
-}
 
 static int get_pwm_ratio(int rpm)
 {
