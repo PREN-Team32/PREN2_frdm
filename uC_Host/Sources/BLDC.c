@@ -119,7 +119,8 @@ byte BLDC_ParseCommand(const unsigned char *cmd,
 		(void) SM1_SendChar(0x71);
 		(void) SM1_SendChar(0x00);
 		(void) SM1_RecvChar(&tmp);
-		set_status(STATUS_ERROR);
+		if( tmp == 0x55)
+			set_status(STATUS_ERROR);
 
 		return ERR_OK;
 	}else if (UTIL1_strcmp((char*)cmd, "BLDC reset") == 0) {

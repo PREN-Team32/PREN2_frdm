@@ -224,23 +224,6 @@ void SM1_OnTxChar(void);
 ** ===================================================================
 */
 
-void SM1_OnError(void);
-/*
-** ===================================================================
-**     Event       :  SM1_OnError (module Events)
-**
-**     Component   :  SM1 [SynchroMaster]
-**     Description :
-**         This event is called when a channel error (not the error
-**         returned by a given method) occurs. The errors can be read
-**         using <GetError> method.
-**         The event is available only when the <Interrupt
-**         service/event> property is enabled.
-**     Parameters  : None
-**     Returns     : Nothing
-** ===================================================================
-*/
-
 /* END Events */
 
 #ifdef __cplusplus
