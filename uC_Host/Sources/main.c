@@ -32,13 +32,10 @@
 #include "Events.h"
 #include "FRTOS1.h"
 #include "UTIL1.h"
-#include "LED_green.h"
+#include "LedGreen.h"
 #include "LEDpin1.h"
 #include "BitIoLdd1.h"
-#include "LED_blue.h"
-#include "LEDpin3.h"
-#include "BitIoLdd3.h"
-#include "LED_red.h"
+#include "LedRed.h"
 #include "LEDpin2.h"
 #include "BitIoLdd2.h"
 #include "TU1.h"
@@ -67,7 +64,7 @@ static void Task1(void *pvParameters)
 {
 	(void)pvParameters;
 	while (1) {
-		LED_green_Neg();
+		LedGreen_Neg();
 		FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
 	}
 
@@ -77,7 +74,7 @@ static void Task2(void *pvParameters)
 {
 	(void)pvParameters;
 	while (1) {
-		LED_red_Neg();
+		LedRed_Neg();
 		FRTOS1_vTaskDelay(500/portTICK_RATE_MS);
 	}
 }
@@ -113,11 +110,25 @@ int main(void)
   */
 
   set_status(STATUS_RESET);
+  BLDC_init();
   SHELL_Init();
 
   if (FRTOS1_xTaskCreate(
-  		  BLDC_update_task,
-  		  (signed portCHAR *)"BLDC",
+  		  DC_update_task,
+  		  (signed portCHAR *)"DC PWM update",
+  		  configMINIMAL_STACK_SIZE,
+  		  (void*)NULL,
+  		  tskIDLE_PRIORITY,
+  		  (xTaskHandle*)NULL
+    	  ) != pdPASS) {
+  	  while (1) {
+  		  // out of heap?
+  	  }
+  }
+
+  if (FRTOS1_xTaskCreate(
+		  BLDC_FSM_update_task,
+  		  (signed portCHAR *)"BLDC FSM",
   		  configMINIMAL_STACK_SIZE,
   		  (void*)NULL,
   		  tskIDLE_PRIORITY,

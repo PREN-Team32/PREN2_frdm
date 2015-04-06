@@ -6,36 +6,36 @@
  */
 
 #include "Error.h"
-#include "LED_red.h"
-#include "LED_green.h"
-#include "LED_blue.h"
+#include "LedRed.h"
+#include "LedGreen.h"
+//#include "LED_blue.h"
 
 
 void set_status(status s)
 {
 	switch (s) {
 	case STATUS_OK:
-		LED_red_Off();
-		LED_green_On();
-		LED_blue_Off();
+		LedRed_Off();
+		LedGreen_On();
+		//LED_blue_Off();
 		break;
 	case STATUS_BUSY:
-		LED_red_Off();
-		LED_green_Off();
-		LED_blue_On();
+		LedRed_Off();
+		LedGreen_Off();
+		//LED_blue_On();
 	case STATUS_ERROR:
-		LED_red_On();
-		LED_green_Off();
-		LED_blue_Off();
+		LedRed_On();
+		LedGreen_Off();
+		//LED_blue_Off();
 	case STATUS_RESET:
-		LED_red_On();
-		LED_green_On();
-		LED_blue_Off();
+		LedRed_On();
+		LedGreen_On();
+		//LED_blue_Off();
 		break;
 	default:
-		LED_red_Off();
-		LED_green_Off();
-		LED_blue_Off();
+		LedRed_Off();
+		LedGreen_Off();
+		//LED_blue_Off();
 		break;
 	}
 }

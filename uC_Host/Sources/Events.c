@@ -29,6 +29,7 @@
 
 #include "Cpu.h"
 #include "Events.h"
+#include "BLDC.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -232,6 +233,7 @@ void CLS1_OnAfterIterateCmd(const uint8_t *cmd)
 void SM1_OnRxChar(void)
 {
   /* Write your code here ... */
+	spi_onReceived();
 }
 
 /*

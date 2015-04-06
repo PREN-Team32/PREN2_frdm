@@ -8,9 +8,9 @@
 #include "FRTOS1.h"
 #include "uC_Host.h"
 #include "CLS1.h"
-#include "LED_red.h"
-#include "LED_green.h"
-#include "LED_blue.h"
+#include "LedRed.h"
+#include "LedGreen.h"
+//#include "LED_blue.h"
 #include "Error.h"
 #include "BLDC.h"
 #include "WAIT1.h"
@@ -18,11 +18,11 @@
 static const CLS1_ParseCommandCallback CmdParserTable[] =
 {
 		CLS1_ParseCommand,
-#if LED1_PARSE_COMMAND_ENABLED
-		LED1_ParseCommand,
+#if LedGreen_PARSE_COMMAND_ENABLED
+		LedGreen_ParseCommand,
 #endif
-#if LED2_PARSE_COMMAND_ENABLED
-		LED2_ParseCommand,
+#if LedRed_PARSE_COMMAND_ENABLED
+		LedRed_ParseCommand,
 #endif
 #if BLDC_PARSE_COMMAND_ENABLED
 		BLDC_ParseCommand,
