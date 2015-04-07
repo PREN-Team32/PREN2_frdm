@@ -21,10 +21,10 @@ typedef union
 {
     struct
     {
-        uint8_t high;   /*!< High byte */
         uint8_t low;    /*!< Low byte */
-    } byte;         /*!< Nibbles */
-    uint16_t value;       /*!< Byte */
+        uint8_t high;   /*!< High byte */
+    } byte;             /*!< Nibbles */
+    uint16_t value;     /*!< Byte */
 } speed_t;
 
 typedef enum
@@ -55,6 +55,18 @@ void BLDC_init(void)
 {
 	BLDC1_Status.ErrorCode = 0x00;
 	BLDC1_Status.State = OFF;
+	BLDC1_Status.rpm.value = 0x8000;
+	if( BLDC1_Status.rpm.byte.high != 0x80)
+	{
+		while (1) {                     /* loop to stop executing if wrong order */
+					/* Hey Programmer */
+					/* It seems that your compiler uses a */
+					/* different order for bitfields than mine. */
+					/* If you still want to use this library, */
+					/* change ,if possible, the order of bitfields in */
+					/* your compiler or in this library! */
+				}
+	}
 	BLDC1_Status.rpm.value = 0x0000;
 }
 
