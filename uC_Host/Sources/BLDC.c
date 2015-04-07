@@ -15,6 +15,18 @@
 #include "SM1.h"
 #include <string.h>
 #include <stdio.h>
+
+
+typedef union
+{
+    struct
+    {
+        uint8_t high;   /*!< High byte */
+        uint8_t low;    /*!< Low byte */
+    } byte;         /*!< Nibbles */
+    uint16_t value;       /*!< Byte */
+} speed_t;
+
 typedef enum
 {
 	ON,
@@ -22,20 +34,18 @@ typedef enum
 }MotorState;
 
 typedef struct{
-	uint8_t rpmLow    :8;
-	uint8_t rpmHigh   :8;
-	uint8_t ErrorCode :8;
+	speed_t rpm;
+	uint8_t ErrorCode;
 	MotorState State;
 	CLS1_StdIOType io;
 }BLDC_MotorState;
 
-static char actualCmd = 0x00;
+static char actualCmd = CMD_DUMMY;
 static BLDC_MotorState BLDC1_Status;
 
-static void BLDC_set_enable(bool status);
 static void BLDC_set_rpm(int rpm);
 static int get_pwm_ratio(int rpm);
-void BLDC_update_FSM(void);
+void BLDC_Receive_from_spi(void);
 
 static int BLDC_enable = 0;
 static int BLDC_rpm = 0;
@@ -45,13 +55,7 @@ void BLDC_init(void)
 {
 	BLDC1_Status.ErrorCode = 0x00;
 	BLDC1_Status.State = OFF;
-	BLDC1_Status.rpmHigh = 0x00;
-	BLDC1_Status.rpmLow = 0x00;
-}
-
-void spi_onReceived(void)
-{
-	BLDC_update_FSM();
+	BLDC1_Status.rpm.value = 0x0000;
 }
 
 static uint8_t PrintStatus(const CLS1_StdIOType *io)
@@ -68,8 +72,8 @@ static uint8_t PrintStatus(const CLS1_StdIOType *io)
 	{
 		CLS1_SendStatusStr((unsigned char*)"  on", (unsigned char*)"no\r\n", io->stdOut);
 	}
-	sprintf(error_message, " %i\r\n", BLDC1_Status.ErrorCode);
-	sprintf(rpm_message, "High-Byte = %i, Low_Byte = %i\r\n", BLDC1_Status.rpmHigh, BLDC1_Status.rpmLow);
+	sprintf(error_message, "%i\r\n", BLDC1_Status.ErrorCode);
+	sprintf(rpm_message, "High-Byte = %i, Low_Byte = %i\r\n", BLDC1_Status.rpm.byte.high, BLDC1_Status.rpm.byte.low);
 	CLS1_SendStatusStr((unsigned char*)"  Error code", (unsigned char*)error_message, io->stdOut);
 	CLS1_SendStatusStr((unsigned char*)"  RPM", (unsigned char*)rpm_message, io->stdOut);
 
@@ -81,8 +85,8 @@ static uint8_t PrintHelp(const CLS1_StdIOType *io)
 	CLS1_SendHelpStr((unsigned char*)"BLDC",
 			 (unsigned char*)"Group of BLDC commands\r\n",
 			 io->stdOut);
-	CLS1_SendHelpStr((unsigned char*)"  help|status",
-			 (unsigned char*)"Print help or status information\r\n",
+	CLS1_SendHelpStr((unsigned char*)"  help",
+			 (unsigned char*)"Print help\r\n",
 			 io->stdOut);
 	CLS1_SendHelpStr((unsigned char*)"  on|off",
 			 (unsigned char*)"Turns it on or off\r\n",
@@ -145,30 +149,26 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 	}
 	else if (UTIL1_strncmp((char*)cmd, "BLDC setrpm ", sizeof("BLDC setrpm")-1) == 0)
 	{
-		if (!BLDC_enable)
+		p = cmd+sizeof("BLDC setrpm");
+		if (UTIL1_xatoi(&p, &val) == ERR_OK && val >= BLDC_RPM_MIN && val <= BLDC_RPM_MAX)
 		{
-			CLS1_SendStr((unsigned char*)"BLDC is off, cannot set RPM\r\n", io->stdErr);
-			res = ERR_FAILED;
+			BLDC1_Status.rpm.value = val;
+			actualCmd = CMD_SET_RPM;
+			(void) SM1_SendChar(actualCmd);
+			SM1_SendChar(BLDC1_Status.rpm.byte.high);
+			SM1_SendChar(BLDC1_Status.rpm.byte.low);
+			*handled = TRUE;
 		}
 		else
 		{
-			p = cmd+sizeof("BLDC setrpm");
-			if (UTIL1_xatoi(&p, &val) == ERR_OK && val >= BLDC_RPM_MIN && val <= BLDC_RPM_MAX)
-			{
-				BLDC_set_rpm(val);
-				*handled = TRUE;
-			}
-			else
-			{
-				sprintf(message, "Wrong argument, must be in range %i to %i", BLDC_RPM_MIN, BLDC_RPM_MAX);
-				CLS1_SendStr((unsigned char*)message, io->stdErr);
-			}
+			sprintf(message, "Wrong argument, must be in range %i to %i", BLDC_RPM_MIN, BLDC_RPM_MAX);
+			CLS1_SendStr((unsigned char*)message, io->stdErr);
 		}
 	}
 	return ERR_OK;
 }
 
-void BLDC_update_FSM(void)
+void BLDC_Receive_from_spi(void)
 {
 	SM1_TComData recv;
 	SM1_RecvChar( &recv );
@@ -179,9 +179,21 @@ void BLDC_update_FSM(void)
 		{
 			/* response to CMD_ARE_YOU_ALIVE */
 			if( recv == I_AM_ALIVE )
-				CLS1_SendStr("Das Board ist am leben \r\n", *BLDC1_Status.io.stdOut);
+				CLS1_SendStatusStr((unsigned char*)" BLDC Status", (unsigned char*)"OK\r\n", *BLDC1_Status.io.stdOut);
+			else
+				CLS1_SendStatusStr((unsigned char*)" BLDC Status", (unsigned char*)"NOK\r\n", *BLDC1_Status.io.stdOut);
 		}
 		break;
+//	case (CMD_SET_RPM & 0xF0):
+//		if(actualCmd == CMD_SET_RPM - 1)
+//		{
+//			SM1_SendChar(BLDC1_Status.rpm.byte.high);//(BLDC1_Status.rpmHigh);
+//		}
+//		if(actualCmd == CMD_SET_RPM - 2)
+//		{
+//			SM1_SendChar(BLDC1_Status.rpm.byte.low);// = (BLDC1_Status.rpmLow);
+//		}
+//		break;
 	case (CMD_GET_STATUS & 0xF0):
 		if ( actualCmd == CMD_GET_STATUS - 1 )
 		{
@@ -199,39 +211,24 @@ void BLDC_update_FSM(void)
 		else if ( actualCmd == CMD_GET_STATUS - 3 )
 		{
 			/*This is the Motor-error code */
-			BLDC1_Status.rpmHigh = recv;
+			BLDC1_Status.rpm.byte.high = recv;
 		}
 		else if ( actualCmd == CMD_GET_STATUS - 4 )
 		{
 			/*This is the Motor-error code */
-			BLDC1_Status.rpmLow = recv;
+			BLDC1_Status.rpm.byte.low = recv;
 			PrintStatus(&BLDC1_Status.io);
 		}
 		break;
 	}
 	if( (actualCmd & 0x0F) != 0)
 	{
-		SM1_SendChar(CMD_DUMMY);
+		if( (actualCmd & 0xF0) != (CMD_SET_RPM & 0xF0) )
+			SM1_SendChar(CMD_DUMMY);
 		actualCmd--;
 	}
 }
 
-
-static void BLDC_set_enable(bool status)
-{
-	if (status) {
-		BLDC_enable = status;
-		BLDC_PWM_ratio = get_pwm_ratio(BLDC_rpm);
-	} else {
-		BLDC_enable = status;
-		BLDC_PWM_ratio = get_pwm_ratio(0);
-	}
-}
-
-int BLDC_get_rpm(void)
-{
-	return BLDC_rpm;
-}
 
 static void BLDC_set_rpm(int rpm)
 {
@@ -256,10 +253,10 @@ void DC_update_task(void *pvParameters)
 	}
 }
 
-void BLDC_FSM_update_task(void *pvParameters)
-{
-	(void)pvParameters;
-	while (1) {
-		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
-	}
-}
+//void BLDC_FSM_update_task(void *pvParameters)
+//{
+//	(void)pvParameters;
+//	while (1) {
+//		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
+//	}
+//}

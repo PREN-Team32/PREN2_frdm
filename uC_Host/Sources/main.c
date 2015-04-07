@@ -126,18 +126,18 @@ int main(void)
   	  }
   }
 
-  if (FRTOS1_xTaskCreate(
-		  BLDC_FSM_update_task,
-  		  (signed portCHAR *)"BLDC FSM",
-  		  configMINIMAL_STACK_SIZE,
-  		  (void*)NULL,
-  		  tskIDLE_PRIORITY,
-  		  (xTaskHandle*)NULL
-    	  ) != pdPASS) {
-  	  while (1) {
-  		  // out of heap?
-  	  }
-  }
+//  if (FRTOS1_xTaskCreate(
+//		  BLDC_FSM_update_task,
+//  		  (signed portCHAR *)"BLDC FSM",
+//  		  configMINIMAL_STACK_SIZE,
+//  		  (void*)NULL,
+//  		  tskIDLE_PRIORITY,
+//  		  (xTaskHandle*)NULL
+//    	  ) != pdPASS) {
+//  	  while (1) {
+//  		  // out of heap?
+//  	  }
+//  }
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
   /*** RTOS startup code. Macro PEX_RTOS_START is defined by the RTOS component. DON'T MODIFY THIS CODE!!! ***/

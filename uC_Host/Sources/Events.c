@@ -233,7 +233,7 @@ void CLS1_OnAfterIterateCmd(const uint8_t *cmd)
 void SM1_OnRxChar(void)
 {
   /* Write your code here ... */
-	spi_onReceived();
+	BLDC_Receive_from_spi();
 }
 
 /*

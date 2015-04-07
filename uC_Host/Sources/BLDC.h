@@ -9,8 +9,8 @@
 #define BLDC_H_
 
 
-#define BLDC_RPM_MIN 0
-#define BLDC_RPM_MAX 20000
+#define BLDC_RPM_MIN 1
+#define BLDC_RPM_MAX 0xFFFF
 
 #define BLDC_PWM_MIN 3276
 #define BLDC_PWM_MAX 6554
@@ -18,6 +18,7 @@
 #define CMD_DUMMY		   0x00
 #define CMD_START          0x10
 #define CMD_STOP           0x20
+#define CMD_SET_RPM		   0x32
 #define CMD_ARE_YOU_ALIVE  0x71
 #define CMD_GET_STATUS     0x64
 
@@ -28,7 +29,7 @@
 
 void BLDC_init(void);
 
-void spi_onReceived(void);
+void BLDC_Receive_from_spi(void);
 byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOType *io);
 
 int BLDC_get_enable(void);
@@ -37,6 +38,6 @@ int BLDC_get_rpm(void);
 
 void DC_update_task(void *pvParameters);
 
-void BLDC_FSM_update_task(void *pvParameters);
+//void BLDC_FSM_update_task(void *pvParameters);
 
 #endif /* BLDC_H_ */
