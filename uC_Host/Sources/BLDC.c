@@ -85,7 +85,7 @@ static uint8_t PrintStatus(const CLS1_StdIOType *io)
 		CLS1_SendStatusStr((unsigned char*)"  on", (unsigned char*)"no\r\n", io->stdOut);
 	}
 	sprintf(error_message, "%i\r\n", BLDC1_Status.ErrorCode);
-	sprintf(rpm_message, "High-Byte = %i, Low_Byte = %i\r\n", BLDC1_Status.rpm.byte.high, BLDC1_Status.rpm.byte.low);
+	sprintf(rpm_message, "High-Byte = %i, Low-Byte = %i\r\n", BLDC1_Status.rpm.byte.high, BLDC1_Status.rpm.byte.low);
 	CLS1_SendStatusStr((unsigned char*)"  Error code", (unsigned char*)error_message, io->stdOut);
 	CLS1_SendStatusStr((unsigned char*)"  RPM", (unsigned char*)rpm_message, io->stdOut);
 
@@ -127,27 +127,34 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 	}
 	else if ((UTIL1_strcmp((char*)cmd, CLS1_CMD_STATUS) == 0) || (UTIL1_strcmp((char*)cmd, "BLDC status") == 0))
 	{
+		set_status(STATUS_BUSY);
 		*handled = TRUE;
 		actualCmd = CMD_GET_STATUS;
 		(void) SM1_SendChar(actualCmd);
+		set_status(STATUS_OK);
 		return ERR_OK;
 	}
 	else if (UTIL1_strcmp((char*)cmd, "BLDC on") == 0)
 	{
+		set_status(STATUS_BUSY);
 		*handled = TRUE;
 		actualCmd = CMD_START;
 		(void) SM1_SendChar(actualCmd);
+		set_status(STATUS_OK);
 		return ERR_OK;
 	}
 	else if (UTIL1_strcmp((char*)cmd, "BLDC off") == 0)
 	{
+		set_status(STATUS_BUSY);
 		*handled = TRUE;
 		actualCmd = CMD_STOP;
 		(void) SM1_SendChar(actualCmd);
+		set_status(STATUS_OK);
 		return ERR_OK;
 	}
 	else if (UTIL1_strcmp((char*)cmd, "debug") == 0)
 	{
+		set_status(STATUS_BUSY);
 		SM1_TComData tmp;
 		*handled = TRUE;
 		actualCmd = CMD_ARE_YOU_ALIVE;
@@ -176,6 +183,22 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 			sprintf(message, "Wrong argument, must be in range %i to %i", BLDC_RPM_MIN, BLDC_RPM_MAX);
 			CLS1_SendStr((unsigned char*)message, io->stdErr);
 		}
+	}else if (UTIL1_strncmp((char*)cmd, "BLDC setpwm ", sizeof("BLDC setpwm")-1) == 0)
+	{
+		p = cmd+sizeof("BLDC setpwm");
+		if (UTIL1_xatoi(&p, &val) == ERR_OK && val >= BLDC_PWM_MIN && val <= BLDC_PWM_MAX)
+		{
+			actualCmd = CMD_SET_PWM;
+			(void) SM1_SendChar(actualCmd);
+			(void) SM1_SendChar((char)val);
+			*handled = TRUE;
+			actualCmd = 0x00;
+		}
+		else
+		{
+			sprintf(message, "Wrong argument, must be in range %i to %i", BLDC_PWM_MIN, BLDC_PWM_MAX);
+			CLS1_SendStr((unsigned char*)message, io->stdErr);
+		}
 	}
 	return ERR_OK;
 }
@@ -196,16 +219,6 @@ void BLDC_Receive_from_spi(void)
 				CLS1_SendStatusStr((unsigned char*)" BLDC Status", (unsigned char*)"NOK\r\n", *BLDC1_Status.io.stdOut);
 		}
 		break;
-//	case (CMD_SET_RPM & 0xF0):
-//		if(actualCmd == CMD_SET_RPM - 1)
-//		{
-//			SM1_SendChar(BLDC1_Status.rpm.byte.high);//(BLDC1_Status.rpmHigh);
-//		}
-//		if(actualCmd == CMD_SET_RPM - 2)
-//		{
-//			SM1_SendChar(BLDC1_Status.rpm.byte.low);// = (BLDC1_Status.rpmLow);
-//		}
-//		break;
 	case (CMD_GET_STATUS & 0xF0):
 		if ( actualCmd == CMD_GET_STATUS - 1 )
 		{
@@ -230,6 +243,7 @@ void BLDC_Receive_from_spi(void)
 			/*This is the Motor-error code */
 			BLDC1_Status.rpm.byte.low = recv;
 			PrintStatus(&BLDC1_Status.io);
+			set_status(STATUS_OK);
 		}
 		break;
 	}

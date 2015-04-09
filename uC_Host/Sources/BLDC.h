@@ -11,15 +11,15 @@
 
 #define BLDC_RPM_MIN 1
 #define BLDC_RPM_MAX 0xFFFF
-
-#define BLDC_PWM_MIN 3276
-#define BLDC_PWM_MAX 6554
+#define BLDC_PWM_MIN 1
+#define BLDC_PWM_MAX 100
 
 #define CMD_DUMMY		   0x00
 #define CMD_START          0x10
 #define CMD_STOP           0x20
 #define CMD_SET_RPM		   0x32
 #define CMD_ARE_YOU_ALIVE  0x71
+#define CMD_SET_PWM		   0x81
 #define CMD_GET_STATUS     0x64
 
 #define I_AM_ALIVE	       0x55
