@@ -113,11 +113,11 @@ static uint8_t PrintHelp(const CLS1_StdIOType *io)
 			 (unsigned char*)"Sets PWM to n\r\n",
 			 io->stdOut);
 	CLS1_SendHelpStr((unsigned char*)"  setvoltage n ",
-			 (unsigned char*)"Sets the voltage on the DRV to n\r\n",
+			 (unsigned char*)"Sets the voltage on the DRV to n mV\r\n",
 			 io->stdOut);
 	CLS1_SendHelpStr((unsigned char*)"  setcurrent n ",
-			 (unsigned char*)"Sets the current on the DRV to n\r\n",
-			 io->stdOut)
+			 (unsigned char*)"Sets the current on the DRV to n mA\r\n",
+			 io->stdOut);
 	return ERR_OK;
 }
 
