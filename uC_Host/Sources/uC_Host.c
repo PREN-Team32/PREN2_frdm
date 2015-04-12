@@ -10,9 +10,9 @@
 #include "CLS1.h"
 #include "LedRed.h"
 #include "LedGreen.h"
-//#include "LED_blue.h"
 #include "Error.h"
 #include "BLDC.h"
+#include "DC.h"
 #include "WAIT1.h"
 
 static const CLS1_ParseCommandCallback CmdParserTable[] =
@@ -26,6 +26,10 @@ static const CLS1_ParseCommandCallback CmdParserTable[] =
 #endif
 #if BLDC_PARSE_COMMAND_ENABLED
 		BLDC_ParseCommand,
+#endif
+
+#if DC_PARSE_COMMAND_ENABLED
+		DC_ParseCommand,
 #endif
 		NULL
 };

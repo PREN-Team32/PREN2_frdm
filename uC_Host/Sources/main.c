@@ -59,6 +59,8 @@
 #include "uC_Host.h"
 #include "Error.h"
 #include "BLDC.h"
+#include "DC.h"
+
 
 static void Task1(void *pvParameters)
 {
@@ -111,6 +113,7 @@ int main(void)
 
   set_status(STATUS_RESET);
   BLDC_init();
+  DC_init();
   SHELL_Init();
 
   if (FRTOS1_xTaskCreate(

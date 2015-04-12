@@ -42,7 +42,6 @@ int BLDC_get_enable(void);
 
 int BLDC_get_rpm(void);
 
-void DC_update_task(void *pvParameters);
 
 //void BLDC_FSM_update_task(void *pvParameters);
 
