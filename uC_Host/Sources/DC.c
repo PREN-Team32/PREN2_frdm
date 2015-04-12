@@ -1,8 +1,7 @@
 
-#include "PWM1.h"
-#include "FRTOS1.h"
-#include "PWM1.h"
 #include "DC.h"
+#include "PWM_DC.h"
+#include "FRTOS1.h"
 #include <stdio.h>
 
 
@@ -78,14 +77,15 @@ byte DC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOTy
 	}
 	else if (UTIL1_strcmp((char*)cmd, "DC on") == 0)
 	{
-		PWM1_Enable();
+		DC_set_rpm(DC_Status.pwm);
+		PWM_DC_Enable();
 		DC_Status.State = ON;
 		*handled = TRUE;
 		return ERR_OK;
 	}
 	else if (UTIL1_strcmp((char*)cmd, "DC off") == 0)
 	{
-		PWM1_Disable();
+		DC_set_rpm(1);
 		DC_Status.State = OFF;
 		*handled = TRUE;
 		return ERR_OK;
@@ -93,38 +93,34 @@ byte DC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOTy
 	else if (UTIL1_strncmp((char*)cmd, "DC setpwm ", sizeof("DC setpwm")-1) == 0)
 	{
 		p = cmd+sizeof("DC setpwm");
-		if (UTIL1_xatoi(&p, &val) == ERR_OK && val >= DC_PWM_MIN && val <= DC_PWM_MAX)
+		if (DC_Status.State == ON)
 		{
-			*handled = TRUE;
-			DC_Status.pwm =(uint8_t) val;
-			DC_set_rpm(val);
+			if (UTIL1_xatoi(&p, &val) == ERR_OK && val >= DC_PWM_MIN && val <= DC_PWM_MAX)
+			{
+				*handled = TRUE;
+				DC_Status.pwm = (uint8_t) val;
+				DC_set_rpm(DC_Status.pwm);
+			}
+			else
+			{
+				sprintf(message, "Wrong argument, must be in range %i to %i", DC_PWM_MIN, DC_PWM_MAX);
+				CLS1_SendStr((unsigned char*)message, io->stdErr);
+			}
 		}
 		else
-		{
-			sprintf(message, "Wrong argument, must be in range %i to %i", DC_PWM_MIN, DC_PWM_MAX);
-			CLS1_SendStr((unsigned char*)message, io->stdErr);
-		}
+			CLS1_SendStr("Der Motor ist nicht on, PWM kann nicht eingestellt werden", io->stdErr);
 	}
 	return ERR_OK;
 }
 
 static void DC_set_rpm(uint8_t pwm_in_Prozent)
 {
-	uint8_t tmp = 0xFFFF/100*pwm_in_Prozent;
-	PWM1_SetRatio16(tmp);
-}
-
-void DC_update_task(void *pvParameters)
-{
-	(void)pvParameters;
-	while (1) {
-//		PwmLdd2_SetRatio16(PwmLdd2_DeviceData, BLDC_PWM_ratio);
-		FRTOS1_vTaskDelay(100/portTICK_RATE_MS);
-	}
+	uint16_t tmp = (uint16_t)(0xFFFF/100)*(uint16_t)pwm_in_Prozent;
+	PWM_DC_SetRatio16(100-tmp);
 }
 
 void DC_init(void)
 {
-	DC_Status.pwm = 75;
+	DC_Status.pwm = 10;
 	DC_Status.State = OFF;
 }

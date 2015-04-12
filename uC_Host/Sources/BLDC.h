@@ -8,6 +8,7 @@
 #ifndef BLDC_H_
 #define BLDC_H_
 
+#include "FRTOS1.h"
 
 #define BLDC_RPM_MIN 1
 #define BLDC_RPM_MAX 0xFFFF

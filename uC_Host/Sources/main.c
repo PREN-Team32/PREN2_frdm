@@ -38,15 +38,15 @@
 #include "LedRed.h"
 #include "LEDpin2.h"
 #include "BitIoLdd2.h"
-#include "TU1.h"
 #include "CLS1.h"
 #include "WAIT1.h"
 #include "CS1.h"
 #include "AS1.h"
 #include "ASerialLdd1.h"
 #include "RxBuf1.h"
-#include "PWM1.h"
-#include "PwmLdd2.h"
+#include "PWM_DC.h"
+#include "PwmLdd3.h"
+#include "TU2.h"
 #include "SM1.h"
 #include "SMasterLdd1.h"
 /* Including shared modules, which are used for whole project */
@@ -60,6 +60,7 @@
 #include "Error.h"
 #include "BLDC.h"
 #include "DC.h"
+#include "FlyingWheel.h"
 
 
 static void Task1(void *pvParameters)
@@ -96,51 +97,12 @@ int main(void)
   /* Write your code here */
   /* For example: for(;;) { } */
 
-  /*
-  if (FRTOS1_xTaskCreate(
-		  Task1,
-		  (signed portCHAR *)"Task1",
-		  configMINIMAL_STACK_SIZE,
-		  (void*)NULL,
-		  tskIDLE_PRIORITY,
-		  (xTaskHandle*)NULL
-  	  ) != pdPASS) {
-	  while (1) {
-		  // out of heap?
-	  }
-  }
-  */
 
   set_status(STATUS_RESET);
   BLDC_init();
   DC_init();
   SHELL_Init();
-
-  if (FRTOS1_xTaskCreate(
-  		  DC_update_task,
-  		  (signed portCHAR *)"DC PWM update",
-  		  configMINIMAL_STACK_SIZE,
-  		  (void*)NULL,
-  		  tskIDLE_PRIORITY,
-  		  (xTaskHandle*)NULL
-    	  ) != pdPASS) {
-  	  while (1) {
-  		  // out of heap?
-  	  }
-  }
-
-//  if (FRTOS1_xTaskCreate(
-//		  BLDC_FSM_update_task,
-//  		  (signed portCHAR *)"BLDC FSM",
-//  		  configMINIMAL_STACK_SIZE,
-//  		  (void*)NULL,
-//  		  tskIDLE_PRIORITY,
-//  		  (xTaskHandle*)NULL
-//    	  ) != pdPASS) {
-//  	  while (1) {
-//  		  // out of heap?
-//  	  }
-//  }
+  FlyingWheel_init();
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
   /*** RTOS startup code. Macro PEX_RTOS_START is defined by the RTOS component. DON'T MODIFY THIS CODE!!! ***/

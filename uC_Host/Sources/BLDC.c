@@ -6,8 +6,6 @@
  */
 
 /* Include shared modules, which are used for whole project */
-#include "IO_Map.h"
-#include "FRTOS1.h"
 
 #include "BLDC.h"
 #include "SM1.h"
@@ -81,7 +79,7 @@ static uint8_t PrintStatus(const CLS1_StdIOType *io)
 		CLS1_SendStatusStr((unsigned char*)"  on", (unsigned char*)"no\r\n", io->stdOut);
 	}
 	sprintf(error_message, "%i\r\n", BLDC1_Status.ErrorCode);
-	sprintf(rpm_message, "High-Byte = %i, Low-Byte = %i RPM-Wert = %i\r\n", BLDC1_Status.rpm.byte.high, BLDC1_Status.rpm.byte.low, BLDC1_Status.rpm.value);
+	sprintf(rpm_message, "High-Byte = %i, Low-Byte = %i, RPM-Wert = %i\r\n", BLDC1_Status.rpm.byte.high, BLDC1_Status.rpm.byte.low, BLDC1_Status.rpm.value);
 	CLS1_SendStatusStr((unsigned char*)"  Error code", (unsigned char*)error_message, io->stdOut);
 	CLS1_SendStatusStr((unsigned char*)"  RPM", (unsigned char*)rpm_message, io->stdOut);
 
