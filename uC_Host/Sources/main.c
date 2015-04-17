@@ -47,6 +47,10 @@
 #include "PWM_DC.h"
 #include "PwmLdd3.h"
 #include "TU2.h"
+#include "CS_BLDC1.h"
+#include "BitIoLdd4.h"
+#include "CS_BLDC2.h"
+#include "BitIoLdd5.h"
 #include "SM1.h"
 #include "SMasterLdd1.h"
 /* Including shared modules, which are used for whole project */

@@ -7,6 +7,8 @@
 
 #include "FlyingWheel.h"
 #include "FRTOS1.h"
+#include "BLDC.h"
+#include "WAIT1.h"
 #include <stdio.h>
 
 static uint8_t PrintHelp(const CLS1_StdIOType *io)
@@ -40,6 +42,16 @@ byte FlyingWheel_ParseCommand(const unsigned char *cmd, bool *handled, const CLS
 		{
 			*handled = TRUE;
 			/* Do Something */
+			setMotor(BLDC1,0);
+			setSpeed(60000);
+			WAIT1_Waitus(5);
+			putBLDC(ON);
+			WAIT1_Waitus(5);
+			setMotor(BLDC2,0);
+			setSpeed(60000);
+			WAIT1_Waitus(5);
+			putBLDC(ON);
+			WAIT1_Waitus(5);
 		}
 		else
 		{

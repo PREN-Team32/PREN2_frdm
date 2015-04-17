@@ -9,9 +9,13 @@
 
 #include "BLDC.h"
 #include "SM1.h"
+#include "CS_BLDC1.h"
+#include "CS_BLDC2.h"
 #include <string.h>
 #include <stdio.h>
 
+#define CS_ENABLE FALSE
+#define CS_DISABLE TRUE
 
 typedef union
 {
@@ -23,11 +27,6 @@ typedef union
     uint16_t value;     /*!< Byte */
 } DobuleByteStruct;
 
-typedef enum
-{
-	ON,
-	OFF
-}MotorState;
 
 typedef struct{
 	DobuleByteStruct rpm;
@@ -41,6 +40,7 @@ static BLDC_MotorState BLDC1_Status;
 static DobuleByteStruct Rpm_to_send;
 static uint16_t BLDC_enable = 0;
 static uint16_t BLDC_rpm = 0;
+static BldcMotors_t Motor = BLDC1;
 
 void BLDC_Receive_from_spi(void);
 
@@ -51,7 +51,8 @@ void BLDC_init(void)
 	BLDC1_Status.rpm.value = 0x8000;
 	if( BLDC1_Status.rpm.byte.high != 0x80)
 	{
-		while (1) {                     /* loop to stop executing if wrong order */
+		while (1) {
+				    /* loop to stop executing if wrong order */
 					/* Hey Programmer */
 					/* It seems that your compiler uses a */
 					/* different order for bitfields than mine. */
@@ -62,6 +63,41 @@ void BLDC_init(void)
 	}
 	BLDC1_Status.rpm.value = 0x0000;
 	Rpm_to_send.value = 0;
+	Motor = BLDC1;
+}
+
+void handleCS(bool en)
+{
+	if(Motor == BLDC1)
+		CS_BLDC1_PutVal(en);
+	else if(Motor == BLDC2)
+		CS_BLDC2_PutVal(en);
+}
+
+void setMotor(BldcMotors_t m, uint16_t speed)
+{
+	Motor = m;
+}
+
+void putBLDC(MotorState s)
+{
+	if(s == ON)
+		actualCmd = CMD_START;
+	else
+		actualCmd = CMD_STOP;
+
+	handleCS(CS_ENABLE);
+	(void) SM1_SendChar(actualCmd);
+}
+
+void setSpeed(uint16_t val)
+{
+	BLDC1_Status.rpm.value = val;
+	actualCmd = CMD_SET_RPM;
+	handleCS(CS_ENABLE);
+	(void) SM1_SendChar(actualCmd);
+	SM1_SendChar((uint8_t)BLDC1_Status.rpm.byte.high);
+	SM1_SendChar((uint8_t)BLDC1_Status.rpm.byte.low);
 }
 
 static uint8_t PrintStatus(const CLS1_StdIOType *io)
@@ -109,6 +145,9 @@ static uint8_t PrintHelp(const CLS1_StdIOType *io)
 	CLS1_SendHelpStr((unsigned char*)"  setcurrent n ",
 			 (unsigned char*)"Sets the current on the DRV to n mA\r\n",
 			 io->stdOut);
+	CLS1_SendHelpStr((unsigned char*)"  use n ",
+			 (unsigned char*)"select the configurable motor\r\n",
+			 io->stdOut);
 	return ERR_OK;
 }
 
@@ -129,6 +168,7 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 	{
 		*handled = TRUE;
 		actualCmd = CMD_GET_STATUS;
+		handleCS(CS_ENABLE);
 		(void) SM1_SendChar(actualCmd);
 		return ERR_OK;
 	}
@@ -136,6 +176,7 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 	{
 		*handled = TRUE;
 		actualCmd = CMD_START;
+		handleCS(CS_ENABLE);
 		(void) SM1_SendChar(actualCmd);
 		return ERR_OK;
 	}
@@ -143,6 +184,7 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 	{
 		*handled = TRUE;
 		actualCmd = CMD_STOP;
+		handleCS(CS_ENABLE);
 		(void) SM1_SendChar(actualCmd);
 		return ERR_OK;
 	}
@@ -151,6 +193,7 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 		SM1_TComData tmp;
 		*handled = TRUE;
 		actualCmd = CMD_ARE_YOU_ALIVE;
+		handleCS(CS_ENABLE);
 		(void) SM1_SendChar(actualCmd);
 		return ERR_OK;
 	}
@@ -160,8 +203,9 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 		if (UTIL1_xatoi(&p, &val) == ERR_OK && val >= BLDC_RPM_MIN && val <= BLDC_RPM_MAX)
 		{
 			BLDC1_Status.rpm.value = val;
-			actualCmd = CMD_DUMMY;
-			(void) SM1_SendChar(CMD_SET_RPM);
+			actualCmd = CMD_SET_RPM;
+			handleCS(CS_ENABLE);
+			(void) SM1_SendChar(actualCmd);
 			SM1_SendChar((uint8_t)BLDC1_Status.rpm.byte.high);
 			SM1_SendChar((uint8_t)BLDC1_Status.rpm.byte.low);
 			*handled = TRUE;
@@ -176,10 +220,11 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 		p = cmd+sizeof("BLDC setpwm");
 		if (UTIL1_xatoi(&p, &val) == ERR_OK && val >= BLDC_PWM_MIN && val <= BLDC_PWM_MAX)
 		{
-			(void) SM1_SendChar(CMD_SET_PWM);
+			actualCmd = CMD_SET_PWM;
+			handleCS(CS_ENABLE);
+			(void) SM1_SendChar(actualCmd);
 			(void) SM1_SendChar((char)val);
 			*handled = TRUE;
-			actualCmd = CMD_DUMMY;
 		}
 		else
 		{
@@ -193,11 +238,12 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 		{
 			DobuleByteStruct tmp;
 			tmp.value = val;
-			(void) SM1_SendChar(CMD_SET_VOLTAGE);
+			actualCmd = CMD_SET_VOLTAGE;
+			handleCS(CS_ENABLE);
+			(void) SM1_SendChar(actualCmd);
 			(void) SM1_SendChar((uint8_t)tmp.byte.high);
 			(void) SM1_SendChar((uint8_t)tmp.byte.low);
 			*handled = TRUE;
-			actualCmd = CMD_DUMMY;
 		}
 		else
 		{
@@ -209,14 +255,28 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 		p = cmd+sizeof("BLDC setcurrent");
 		if (UTIL1_xatoi(&p, &val) == ERR_OK && val >= BLDC_DRV_CURRENT_MIN && val <= BLDC_DRV_CURRENT_MAX)
 		{
-			(void) SM1_SendChar(CMD_SET_CURRENT);
+			actualCmd = CMD_SET_CURRENT;
+			handleCS(CS_ENABLE);
+			(void) SM1_SendChar(actualCmd);
 			(void) SM1_SendChar((uint8_t)val);
 			*handled = TRUE;
-			actualCmd = CMD_DUMMY;
 		}
 		else
 		{
 			sprintf(message, "Wrong argument, must be in range %i to %i", BLDC_DRV_CURRENT_MIN, BLDC_DRV_CURRENT_MAX);
+			CLS1_SendStr((unsigned char*)message, io->stdErr);
+		}
+	}else if (UTIL1_strncmp((char*)cmd, "BLDC use ", sizeof("BLDC use")-1) == 0)
+	{
+		p = cmd+sizeof("BLDC use");
+		if (UTIL1_xatoi(&p, &val) == ERR_OK && val >= BLDC_MOTORS_MIN && val <= BLDC_MOTORS_MAX)
+		{
+			*handled = TRUE;
+			Motor = val & 0x000F;
+		}
+		else
+		{
+			sprintf(message, "Wrong argument, must be in range %i to %i", BLDC_MOTORS_MIN, BLDC_MOTORS_MAX);
 			CLS1_SendStr((unsigned char*)message, io->stdErr);
 		}
 	}
@@ -271,4 +331,6 @@ void BLDC_Receive_from_spi(void)
 		SM1_SendChar(CMD_DUMMY);
 		actualCmd--;
 	}
+	else
+		handleCS(CS_DISABLE);
 }

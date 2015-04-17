@@ -18,6 +18,8 @@
 #define BLDC_DRV_VOLTAGE_MAX 2400
 #define BLDC_DRV_CURRENT_MIN 25
 #define BLDC_DRV_CURRENT_MAX 255
+#define BLDC_MOTORS_MIN 0
+#define BLDC_MOTORS_MAX 1
 
 #define CMD_DUMMY		   0x00
 #define CMD_START          0x10
@@ -34,7 +36,25 @@
 #define BLDC_PARSE_COMMAND_ENABLED 1 /* set to 1 if method ParseCommand()
 					is present, 0 otherwise */
 
+
+typedef enum
+{
+	ON,
+	OFF
+}MotorState;
+
+typedef enum
+{
+	BLDC1,
+	BLDC2
+}BldcMotors_t;
+
 void BLDC_init(void);
+
+void setMotor(BldcMotors_t m, uint16_t speed);
+void putBLDC(MotorState s);
+void setSpeed(uint16_t val);
+
 
 void BLDC_Receive_from_spi(void);
 byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOType *io);
