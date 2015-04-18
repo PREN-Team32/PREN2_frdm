@@ -55,6 +55,10 @@
 #include "BitIoLdd4.h"
 #include "CS_BLDC2.h"
 #include "BitIoLdd5.h"
+#include "BLDC1_IRQ.h"
+#include "ExtIntLdd1.h"
+#include "BLDC2_IRQ.h"
+#include "ExtIntLdd2.h"
 #include "SM1.h"
 #include "SMasterLdd1.h"
 
@@ -220,6 +224,34 @@ void SM1_OnTxChar(void);
 **     Component   :  SM1 [SynchroMaster]
 **     Description :
 **         This event is called after a character is transmitted.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+
+void BLDC2_IRQ_OnInterrupt(void);
+/*
+** ===================================================================
+**     Event       :  BLDC2_IRQ_OnInterrupt (module Events)
+**
+**     Component   :  BLDC2_IRQ [ExtInt]
+**     Description :
+**         This event is called when an active signal edge/level has
+**         occurred.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+
+void BLDC1_IRQ_OnInterrupt(void);
+/*
+** ===================================================================
+**     Event       :  BLDC1_IRQ_OnInterrupt (module Events)
+**
+**     Component   :  BLDC1_IRQ [ExtInt]
+**     Description :
+**         This event is called when an active signal edge/level has
+**         occurred.
 **     Parameters  : None
 **     Returns     : Nothing
 ** ===================================================================

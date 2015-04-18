@@ -44,4 +44,9 @@ int BLDC_get_enable(void);
 
 int BLDC_get_rpm(void);
 
+void bldc1_irq_occurred(void);
+#if MORE_AS_ONE_SLAVE
+void bldc2_irq_occurred(void);
+#endif
+
 #endif /* BLDC_H_ */

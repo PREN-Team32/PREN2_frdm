@@ -13,6 +13,10 @@
 	#include "CS_BLDC1.h"
 	#include "CS_BLDC2.h"
 #endif
+#include "BLDC1_IRQ.h"
+#if MORE_AS_ONE_SLAVE
+	#include "BLDC2_IRQ.h"
+#endif
 #include <string.h>
 #include <stdio.h>
 
@@ -67,7 +71,6 @@ static uint16_t BLDC_enable = 0;
 static uint16_t BLDC_rpm = 0;
 static BldcMotors_t Motor = BLDC1;
 
-void BLDC_Receive_from_spi(void);
 
 void BLDC_init(void)
 {
@@ -375,3 +378,29 @@ void BLDC_Receive_from_spi(void)
 	else
 		handleCS(CS_DISABLE);
 }
+
+void bldc1_irq_occurred(void)
+{
+	Motor = BLDC1;
+	if( BLDC1_IRQ_GetVal() )
+	{
+		CLS1_SendStatusStr((unsigned char*)" BLDC1 error", (unsigned char*)"an error occurred\r\n", *BLDC1_Status.io.stdOut);
+		actualCmd = CMD_STOP;
+		handleCS(CS_ENABLE);
+		(void) SM1_SendChar(actualCmd);
+	}
+}
+
+#if MORE_AS_ONE_SLAVE
+void bldc2_irq_occurred(void)
+{
+	Motor = BLDC2;
+	if( BLDC2_IRQ_GetVal() )
+	{
+		CLS1_SendStatusStr((unsigned char*)" BLDC2 error", (unsigned char*)"an error occurred\r\n", *BLDC1_Status.io.stdOut);
+		actualCmd = CMD_STOP;
+		handleCS(CS_ENABLE);
+		(void) SM1_SendChar(actualCmd);
+	}
+}
+#endif

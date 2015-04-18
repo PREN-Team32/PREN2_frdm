@@ -22,9 +22,15 @@ static const CLS1_ParseCommandCallback CmdParserTable[] =
 #if LedGreen_PARSE_COMMAND_ENABLED
 		LedGreen_ParseCommand,
 #endif
+
 #if LedRed_PARSE_COMMAND_ENABLED
 		LedRed_ParseCommand,
 #endif
+
+#if LedBlue_PARSE_COMMAND_ENABLED
+		LedBlue_ParseCommand,
+#endif
+
 #if BLDC_PARSE_COMMAND_ENABLED
 		BLDC_ParseCommand,
 #endif

@@ -29,7 +29,6 @@
 
 #include "Cpu.h"
 #include "Events.h"
-#include "BLDC.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +36,7 @@ extern "C" {
 
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
-
+#include "BLDC.h"
 /*
 ** ===================================================================
 **     Event       :  Cpu_OnNMIINT (module Events)
@@ -250,6 +249,42 @@ void SM1_OnRxChar(void)
 void SM1_OnTxChar(void)
 {
   /* Write your code here ... */
+}
+
+/*
+** ===================================================================
+**     Event       :  BLDC2_IRQ_OnInterrupt (module Events)
+**
+**     Component   :  BLDC2_IRQ [ExtInt]
+**     Description :
+**         This event is called when an active signal edge/level has
+**         occurred.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+void BLDC2_IRQ_OnInterrupt(void)
+{
+#if MORE_AS_ONE_SLAVE
+	bldc2_irq_occurred();
+#endif
+}
+
+/*
+** ===================================================================
+**     Event       :  BLDC1_IRQ_OnInterrupt (module Events)
+**
+**     Component   :  BLDC1_IRQ [ExtInt]
+**     Description :
+**         This event is called when an active signal edge/level has
+**         occurred.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+void BLDC1_IRQ_OnInterrupt(void)
+{
+	bldc1_irq_occurred();
 }
 
 /* END Events */

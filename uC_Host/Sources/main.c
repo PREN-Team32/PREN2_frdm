@@ -51,6 +51,10 @@
 #include "BitIoLdd4.h"
 #include "CS_BLDC2.h"
 #include "BitIoLdd5.h"
+#include "BLDC1_IRQ.h"
+#include "ExtIntLdd1.h"
+#include "BLDC2_IRQ.h"
+#include "ExtIntLdd2.h"
 #include "SM1.h"
 #include "SMasterLdd1.h"
 /* Including shared modules, which are used for whole project */
