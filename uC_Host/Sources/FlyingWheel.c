@@ -42,12 +42,12 @@ byte FlyingWheel_ParseCommand(const unsigned char *cmd, bool *handled, const CLS
 		{
 			*handled = TRUE;
 			/* Do Something */
-			setMotor(BLDC1,0);
+			setMotor(BLDC1);
 			setSpeed(60000);
 			WAIT1_Waitus(5);
 			putBLDC(ON);
 			WAIT1_Waitus(5);
-			setMotor(BLDC2,0);
+			setMotor(BLDC2);
 			setSpeed(60000);
 			WAIT1_Waitus(5);
 			putBLDC(ON);

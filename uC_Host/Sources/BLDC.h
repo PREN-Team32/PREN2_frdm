@@ -36,7 +36,11 @@
 #define BLDC_PARSE_COMMAND_ENABLED 1 /* set to 1 if method ParseCommand()
 					is present, 0 otherwise */
 
+#define CS_HANDELD_BY_CODEEXPERT 0
 
+#if CS_HANDELD_BY_CODEEXPERT == 0
+#define MORE_AS_ONE_SLAVE 1
+#endif
 typedef enum
 {
 	ON,
@@ -51,9 +55,9 @@ typedef enum
 
 void BLDC_init(void);
 
-void setMotor(BldcMotors_t m, uint16_t speed);
-void putBLDC(MotorState s);
-void setSpeed(uint16_t val);
+void setMotor(BldcMotors_t m);
+uint8_t putBLDC(MotorState s);
+uint8_t setSpeed(uint16_t val);
 
 
 void BLDC_Receive_from_spi(void);
@@ -62,8 +66,5 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 int BLDC_get_enable(void);
 
 int BLDC_get_rpm(void);
-
-
-//void BLDC_FSM_update_task(void *pvParameters);
 
 #endif /* BLDC_H_ */

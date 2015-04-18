@@ -9,8 +9,10 @@
 
 #include "BLDC.h"
 #include "SM1.h"
-#include "CS_BLDC1.h"
-#include "CS_BLDC2.h"
+#if CS_HANDELD_BY_CODEEXPERT == 0
+	#include "CS_BLDC1.h"
+	#include "CS_BLDC2.h"
+#endif
 #include <string.h>
 #include <stdio.h>
 
@@ -26,7 +28,6 @@ typedef union
     } byte;             /*!< Nibbles */
     uint16_t value;     /*!< Byte */
 } DobuleByteStruct;
-
 
 typedef struct{
 	DobuleByteStruct rpm;
@@ -68,19 +69,24 @@ void BLDC_init(void)
 
 void handleCS(bool en)
 {
+#if CS_HANDELD_BY_CODEEXPERT == 0
 	if(Motor == BLDC1)
 		CS_BLDC1_PutVal(en);
 	else if(Motor == BLDC2)
 		CS_BLDC2_PutVal(en);
+#endif
 }
 
-void setMotor(BldcMotors_t m, uint16_t speed)
+void setMotor(BldcMotors_t m)
 {
 	Motor = m;
 }
 
-void putBLDC(MotorState s)
+uint8_t putBLDC(MotorState s)
 {
+	if( (CS_BLDC1_GetVal() == CS_ENABLE ) || ( CS_BLDC2_GetVal() == CS_ENABLE) )
+		return 1;
+
 	if(s == ON)
 		actualCmd = CMD_START;
 	else
@@ -88,16 +94,20 @@ void putBLDC(MotorState s)
 
 	handleCS(CS_ENABLE);
 	(void) SM1_SendChar(actualCmd);
+	return 0;
 }
 
-void setSpeed(uint16_t val)
+uint8_t setSpeed(uint16_t val)
 {
+	if( (CS_BLDC1_GetVal() == CS_ENABLE ) || ( CS_BLDC2_GetVal() == CS_ENABLE) )
+		return 1;
 	BLDC1_Status.rpm.value = val;
 	actualCmd = CMD_SET_RPM;
 	handleCS(CS_ENABLE);
 	(void) SM1_SendChar(actualCmd);
 	SM1_SendChar((uint8_t)BLDC1_Status.rpm.byte.high);
 	SM1_SendChar((uint8_t)BLDC1_Status.rpm.byte.low);
+	return 0;
 }
 
 static uint8_t PrintStatus(const CLS1_StdIOType *io)
@@ -145,9 +155,11 @@ static uint8_t PrintHelp(const CLS1_StdIOType *io)
 	CLS1_SendHelpStr((unsigned char*)"  setcurrent n ",
 			 (unsigned char*)"Sets the current on the DRV to n mA\r\n",
 			 io->stdOut);
+#if MORE_AS_ONE_SLAVE
 	CLS1_SendHelpStr((unsigned char*)"  use n ",
 			 (unsigned char*)"select the configurable motor\r\n",
 			 io->stdOut);
+#endif
 	return ERR_OK;
 }
 
@@ -266,7 +278,9 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 			sprintf(message, "Wrong argument, must be in range %i to %i", BLDC_DRV_CURRENT_MIN, BLDC_DRV_CURRENT_MAX);
 			CLS1_SendStr((unsigned char*)message, io->stdErr);
 		}
-	}else if (UTIL1_strncmp((char*)cmd, "BLDC use ", sizeof("BLDC use")-1) == 0)
+	}
+#if MORE_AS_ONE_SLAVE
+	else if (UTIL1_strncmp((char*)cmd, "BLDC use ", sizeof("BLDC use")-1) == 0)
 	{
 		p = cmd+sizeof("BLDC use");
 		if (UTIL1_xatoi(&p, &val) == ERR_OK && val >= BLDC_MOTORS_MIN && val <= BLDC_MOTORS_MAX)
@@ -280,6 +294,7 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 			CLS1_SendStr((unsigned char*)message, io->stdErr);
 		}
 	}
+#endif
 	return ERR_OK;
 }
 
@@ -293,6 +308,7 @@ void BLDC_Receive_from_spi(void)
 		if(actualCmd == CMD_ARE_YOU_ALIVE - 1)
 		{
 			/* response to CMD_ARE_YOU_ALIVE */
+			handleCS(CS_DISABLE);
 			if( recv == I_AM_ALIVE )
 				CLS1_SendStatusStr((unsigned char*)" BLDC Status", (unsigned char*)"OK\r\n", *BLDC1_Status.io.stdOut);
 			else
@@ -322,6 +338,7 @@ void BLDC_Receive_from_spi(void)
 		{
 			/*This is the Motor-error code */
 			BLDC1_Status.rpm.byte.low = recv;
+			handleCS(CS_DISABLE);
 			PrintStatus(&BLDC1_Status.io);
 		}
 		break;
