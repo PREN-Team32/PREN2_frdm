@@ -68,7 +68,6 @@
 #include "Error.h"
 #include "BLDC.h"
 #include "DC.h"
-#include "FlyingWheel.h"
 
 
 static void Task1(void *pvParameters)
@@ -110,7 +109,6 @@ int main(void)
   BLDC_init();
   DC_init();
   SHELL_Init();
-  FlyingWheel_init();
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
   /*** RTOS startup code. Macro PEX_RTOS_START is defined by the RTOS component. DON'T MODIFY THIS CODE!!! ***/

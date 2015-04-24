@@ -14,7 +14,6 @@
 #include "BLDC.h"
 #include "DC.h"
 #include "WAIT1.h"
-#include "FlyingWheel.h"
 
 static const CLS1_ParseCommandCallback CmdParserTable[] =
 {
@@ -37,10 +36,6 @@ static const CLS1_ParseCommandCallback CmdParserTable[] =
 
 #if DC_PARSE_COMMAND_ENABLED
 		DC_ParseCommand,
-#endif
-
-#if FLYING_PARSE_COMMAND_ENABLED
-		FlyingWheel_ParseCommand,
 #endif
 		NULL
 };

@@ -16,6 +16,7 @@
 #include "BLDC1_IRQ.h"
 #if MORE_AS_ONE_SLAVE
 	#include "BLDC2_IRQ.h"
+	#include "WAIT1.h"
 #endif
 #include <string.h>
 #include <stdio.h>
@@ -186,6 +187,12 @@ static uint8_t PrintHelp(const CLS1_StdIOType *io)
 	CLS1_SendHelpStr((unsigned char*)"  use n ",
 			 (unsigned char*)"select the configurable motor\r\n",
 			 io->stdOut);
+	CLS1_SendHelpStr((unsigned char*)"  all on ",
+			 (unsigned char*)"starts all BLDC motors\r\n",
+			 io->stdOut);
+	CLS1_SendHelpStr((unsigned char*)"  all off ",
+			 (unsigned char*)"stops all BLDC motors\r\n",
+			 io->stdOut);
 #endif
 	return ERR_OK;
 }
@@ -320,6 +327,29 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 			sprintf(message, "Wrong argument, must be in range %i to %i", BLDC_MOTORS_MIN, BLDC_MOTORS_MAX);
 			CLS1_SendStr((unsigned char*)message, io->stdErr);
 		}
+	}else if (UTIL1_strcmp((char*)cmd, "BLDC all on") == 0)
+	{
+		*handled = TRUE;
+		setMotor(BLDC1);
+		setSpeed(60000);
+		WAIT1_Waitus(5);
+		putBLDC(ON);
+		WAIT1_Waitus(5);
+		setMotor(BLDC2);
+		setSpeed(60000);
+		WAIT1_Waitus(5);
+		putBLDC(ON);
+		WAIT1_Waitus(5);
+		return ERR_OK;
+	}else if (UTIL1_strcmp((char*)cmd, "BLDC all off") == 0)
+	{
+		*handled = TRUE;
+		setMotor(BLDC1);
+		putBLDC(OFF);
+		WAIT1_Waitus(5);
+		setMotor(BLDC2);
+		putBLDC(OFF);
+		return ERR_OK;
 	}
 #endif
 	return ERR_OK;
