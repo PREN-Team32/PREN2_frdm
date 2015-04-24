@@ -93,8 +93,8 @@ byte DC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOTy
 	else if (UTIL1_strncmp((char*)cmd, "DC setpwm ", sizeof("DC setpwm")-1) == 0)
 	{
 		p = cmd+sizeof("DC setpwm");
-		if (DC_Status.State == ON)
-		{
+//		if (DC_Status.State == ON)
+//		{
 			if (UTIL1_xatoi(&p, &val) == ERR_OK && val >= DC_PWM_MIN && val <= DC_PWM_MAX)
 			{
 				*handled = TRUE;
@@ -106,9 +106,9 @@ byte DC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIOTy
 				sprintf(message, "Wrong argument, must be in range %i to %i", DC_PWM_MIN, DC_PWM_MAX);
 				CLS1_SendStr((unsigned char*)message, io->stdErr);
 			}
-		}
-		else
-			CLS1_SendStr("Der Motor ist nicht on, PWM kann nicht eingestellt werden", io->stdErr);
+//		}
+//		else
+//			CLS1_SendStr("Der Motor ist nicht on, PWM kann nicht eingestellt werden", io->stdErr);
 	}
 	return ERR_OK;
 }
@@ -121,6 +121,6 @@ static void DC_set_rpm(uint8_t pwm_in_Prozent)
 
 void DC_init(void)
 {
-	DC_Status.pwm = 10;
+	DC_Status.pwm = 50;
 	DC_Status.State = OFF;
 }
