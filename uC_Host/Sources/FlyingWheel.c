@@ -59,6 +59,16 @@ byte FlyingWheel_ParseCommand(const unsigned char *cmd, bool *handled, const CLS
 			CLS1_SendStr((unsigned char*)message, io->stdErr);
 		}
 	}
+	else if (UTIL1_strcmp((char*)cmd, "FLYING off") == 0)
+	{
+		*handled = TRUE;
+		setMotor(BLDC1);
+		putBLDC(OFF);
+		WAIT1_Waitus(5);
+		setMotor(BLDC2);
+		putBLDC(OFF);
+		return ERR_OK;
+	}
 	return ERR_OK;
 }
 void FlyingWheel(void)

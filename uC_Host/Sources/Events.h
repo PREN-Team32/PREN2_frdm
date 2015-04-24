@@ -59,7 +59,7 @@
 #include "ExtIntLdd1.h"
 #include "BLDC2_IRQ.h"
 #include "ExtIntLdd2.h"
-#include "SM1.h"
+#include "BLDCspi.h"
 #include "SMasterLdd1.h"
 
 #ifdef __cplusplus
@@ -201,12 +201,12 @@ void CLS1_OnAfterIterateCmd(const uint8_t *cmd);
 ** ===================================================================
 */
 
-void SM1_OnRxChar(void);
+void BLDCspi_OnRxChar(void);
 /*
 ** ===================================================================
-**     Event       :  SM1_OnRxChar (module Events)
+**     Event       :  BLDCspi_OnRxChar (module Events)
 **
-**     Component   :  SM1 [SynchroMaster]
+**     Component   :  BLDCspi [SynchroMaster]
 **     Description :
 **         This event is called after a correct character is received.
 **         The event is available only when the <Interrupt
@@ -216,12 +216,12 @@ void SM1_OnRxChar(void);
 ** ===================================================================
 */
 
-void SM1_OnTxChar(void);
+void BLDCspi_OnTxChar(void);
 /*
 ** ===================================================================
-**     Event       :  SM1_OnTxChar (module Events)
+**     Event       :  BLDCspi_OnTxChar (module Events)
 **
-**     Component   :  SM1 [SynchroMaster]
+**     Component   :  BLDCspi [SynchroMaster]
 **     Description :
 **         This event is called after a character is transmitted.
 **     Parameters  : None

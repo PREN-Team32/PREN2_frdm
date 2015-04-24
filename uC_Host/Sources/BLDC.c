@@ -8,7 +8,7 @@
 /* Include shared modules, which are used for whole project */
 
 #include "BLDC.h"
-#include "SM1.h"
+#include "BLDCspi.h"
 #if CS_HANDELD_BY_CODEEXPERT == 0
 	#include "CS_BLDC1.h"
 	#include "CS_BLDC2.h"
@@ -120,7 +120,7 @@ uint8_t putBLDC(MotorState s)
 		actualCmd = CMD_STOP;
 
 	handleCS(CS_ENABLE);
-	(void) SM1_SendChar(actualCmd);
+	(void) BLDCspi_SendChar(actualCmd);
 	return 0;
 }
 
@@ -131,9 +131,9 @@ uint8_t setSpeed(uint16_t val)
 	BLDC1_Status.rpm.value = val;
 	actualCmd = CMD_SET_RPM;
 	handleCS(CS_ENABLE);
-	(void) SM1_SendChar(actualCmd);
-	SM1_SendChar((uint8_t)BLDC1_Status.rpm.byte.high);
-	SM1_SendChar((uint8_t)BLDC1_Status.rpm.byte.low);
+	(void) BLDCspi_SendChar(actualCmd);
+	BLDCspi_SendChar((uint8_t)BLDC1_Status.rpm.byte.high);
+	BLDCspi_SendChar((uint8_t)BLDC1_Status.rpm.byte.low);
 	return 0;
 }
 
@@ -208,7 +208,7 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 		*handled = TRUE;
 		actualCmd = CMD_GET_STATUS;
 		handleCS(CS_ENABLE);
-		(void) SM1_SendChar(actualCmd);
+		(void) BLDCspi_SendChar(actualCmd);
 		return ERR_OK;
 	}
 	else if (UTIL1_strcmp((char*)cmd, "BLDC on") == 0)
@@ -216,7 +216,7 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 		*handled = TRUE;
 		actualCmd = CMD_START;
 		handleCS(CS_ENABLE);
-		(void) SM1_SendChar(actualCmd);
+		(void) BLDCspi_SendChar(actualCmd);
 		return ERR_OK;
 	}
 	else if (UTIL1_strcmp((char*)cmd, "BLDC off") == 0)
@@ -224,16 +224,16 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 		*handled = TRUE;
 		actualCmd = CMD_STOP;
 		handleCS(CS_ENABLE);
-		(void) SM1_SendChar(actualCmd);
+		(void) BLDCspi_SendChar(actualCmd);
 		return ERR_OK;
 	}
 	else if (UTIL1_strcmp((char*)cmd, "debug") == 0)
 	{
-		SM1_TComData tmp;
+		BLDCspi_TComData tmp;
 		*handled = TRUE;
 		actualCmd = CMD_ARE_YOU_ALIVE;
 		handleCS(CS_ENABLE);
-		(void) SM1_SendChar(actualCmd);
+		(void) BLDCspi_SendChar(actualCmd);
 		return ERR_OK;
 	}
 	else if (UTIL1_strncmp((char*)cmd, "BLDC setrpm ", sizeof("BLDC setrpm")-1) == 0)
@@ -244,9 +244,9 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 			BLDC1_Status.rpm.value = val;
 			actualCmd = CMD_SET_RPM;
 			handleCS(CS_ENABLE);
-			(void) SM1_SendChar(actualCmd);
-			SM1_SendChar((uint8_t)BLDC1_Status.rpm.byte.high);
-			SM1_SendChar((uint8_t)BLDC1_Status.rpm.byte.low);
+			(void) BLDCspi_SendChar(actualCmd);
+			BLDCspi_SendChar((uint8_t)BLDC1_Status.rpm.byte.high);
+			BLDCspi_SendChar((uint8_t)BLDC1_Status.rpm.byte.low);
 			*handled = TRUE;
 		}
 		else
@@ -261,8 +261,8 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 		{
 			actualCmd = CMD_SET_PWM;
 			handleCS(CS_ENABLE);
-			(void) SM1_SendChar(actualCmd);
-			(void) SM1_SendChar((char)val);
+			(void) BLDCspi_SendChar(actualCmd);
+			(void) BLDCspi_SendChar((char)val);
 			*handled = TRUE;
 		}
 		else
@@ -279,9 +279,9 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 			tmp.value = val;
 			actualCmd = CMD_SET_VOLTAGE;
 			handleCS(CS_ENABLE);
-			(void) SM1_SendChar(actualCmd);
-			(void) SM1_SendChar((uint8_t)tmp.byte.high);
-			(void) SM1_SendChar((uint8_t)tmp.byte.low);
+			(void) BLDCspi_SendChar(actualCmd);
+			(void) BLDCspi_SendChar((uint8_t)tmp.byte.high);
+			(void) BLDCspi_SendChar((uint8_t)tmp.byte.low);
 			*handled = TRUE;
 		}
 		else
@@ -296,8 +296,8 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 		{
 			actualCmd = CMD_SET_CURRENT;
 			handleCS(CS_ENABLE);
-			(void) SM1_SendChar(actualCmd);
-			(void) SM1_SendChar((uint8_t)val);
+			(void) BLDCspi_SendChar(actualCmd);
+			(void) BLDCspi_SendChar((uint8_t)val);
 			*handled = TRUE;
 		}
 		else
@@ -327,8 +327,8 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 
 void BLDC_Receive_from_spi(void)
 {
-	SM1_TComData recv;
-	SM1_RecvChar( &recv );
+	BLDCspi_TComData recv;
+	BLDCspi_RecvChar( &recv );
 	switch(actualCmd & 0xF0)
 	{
 	case (CMD_ARE_YOU_ALIVE & 0xF0):
@@ -372,7 +372,7 @@ void BLDC_Receive_from_spi(void)
 	}
 	if( (actualCmd & 0x0F) != 0)
 	{
-		SM1_SendChar(CMD_DUMMY);
+		BLDCspi_SendChar(CMD_DUMMY);
 		actualCmd--;
 	}
 	else
@@ -387,7 +387,7 @@ void bldc1_irq_occurred(void)
 		CLS1_SendStatusStr((unsigned char*)" BLDC1 error", (unsigned char*)"an error occurred\r\n", *BLDC1_Status.io.stdOut);
 		actualCmd = CMD_STOP;
 		handleCS(CS_ENABLE);
-		(void) SM1_SendChar(actualCmd);
+		(void) BLDCspi_SendChar(actualCmd);
 	}
 }
 
@@ -400,7 +400,7 @@ void bldc2_irq_occurred(void)
 		CLS1_SendStatusStr((unsigned char*)" BLDC2 error", (unsigned char*)"an error occurred\r\n", *BLDC1_Status.io.stdOut);
 		actualCmd = CMD_STOP;
 		handleCS(CS_ENABLE);
-		(void) SM1_SendChar(actualCmd);
+		(void) BLDCspi_SendChar(actualCmd);
 	}
 }
 #endif

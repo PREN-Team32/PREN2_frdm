@@ -218,9 +218,9 @@ void CLS1_OnAfterIterateCmd(const uint8_t *cmd)
 
 /*
 ** ===================================================================
-**     Event       :  SM1_OnRxChar (module Events)
+**     Event       :  BLDCspi_OnRxChar (module Events)
 **
-**     Component   :  SM1 [SynchroMaster]
+**     Component   :  BLDCspi [SynchroMaster]
 **     Description :
 **         This event is called after a correct character is received.
 **         The event is available only when the <Interrupt
@@ -229,7 +229,7 @@ void CLS1_OnAfterIterateCmd(const uint8_t *cmd)
 **     Returns     : Nothing
 ** ===================================================================
 */
-void SM1_OnRxChar(void)
+void BLDCspi_OnRxChar(void)
 {
   /* Write your code here ... */
 	BLDC_Receive_from_spi();
@@ -237,16 +237,16 @@ void SM1_OnRxChar(void)
 
 /*
 ** ===================================================================
-**     Event       :  SM1_OnTxChar (module Events)
+**     Event       :  BLDCspi_OnTxChar (module Events)
 **
-**     Component   :  SM1 [SynchroMaster]
+**     Component   :  BLDCspi [SynchroMaster]
 **     Description :
 **         This event is called after a character is transmitted.
 **     Parameters  : None
 **     Returns     : Nothing
 ** ===================================================================
 */
-void SM1_OnTxChar(void)
+void BLDCspi_OnTxChar(void)
 {
   /* Write your code here ... */
 }

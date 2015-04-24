@@ -3,8 +3,8 @@
   <Header>
     <Name>uC_Host</Name>
     <SavedBy>studer.yves</SavedBy>
-    <ModificationStamp>91</ModificationStamp>
-    <Date>2015-04-18</Date>
+    <ModificationStamp>94</ModificationStamp>
+    <Date>2015-04-23</Date>
     <IDE>Eclipse IDE</IDE>
     <PEversion>1.10.1.RT6_b1444-1070</PEversion>
   </Header>
@@ -29,7 +29,7 @@
     <UseExistingModules>true</UseExistingModules>
     <RenamePeripheries>false</RenamePeripheries>
     <Autodependency>true</Autodependency>
-    <ProjectCompNumb>114</ProjectCompNumb>
+    <ProjectCompNumb>117</ProjectCompNumb>
     <DelUnusedPreviouslyGenFiles>true</DelUnusedPreviouslyGenFiles>
     <GeneratedCodeFrozen>false</GeneratedCodeFrozen>
     <AssignInitComponentNameToPrph>true</AssignInitComponentNameToPrph>
@@ -8936,8 +8936,6 @@
               <List lines_count="0" />
               <UnitText />
               <MinCounterTicks>0</MinCounterTicks>
-              <ControlledTimingCfgFromPropertySymbol>PeriodTmg</ControlledTimingCfgFromPropertySymbol>
-              <ControlledTimingCfgFromComponentRef>InheritedComponent</ControlledTimingCfgFromComponentRef>
             </ItemState>
             <ItemState>
               <ItemSymbol>InitDuty</ItemSymbol>
@@ -8977,8 +8975,6 @@
               <List lines_count="0" />
               <UnitText />
               <MinCounterTicks>0</MinCounterTicks>
-              <ControlledTimingCfgFromPropertySymbol>DutyTmg</ControlledTimingCfgFromPropertySymbol>
-              <ControlledTimingCfgFromComponentRef>InheritedComponent</ControlledTimingCfgFromComponentRef>
             </ItemState>
             <ItemState>
               <ItemSymbol>HC08grp</ItemSymbol>
@@ -10454,7 +10450,7 @@
                   </ItemState>
                   <ItemState>
                     <ItemSymbol>Deinit</ItemSymbol>
-                    <ReadOnly>false</ReadOnly>
+                    <ReadOnly>true</ReadOnly>
                     <UserReadOnly>false</UserReadOnly>
                     <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
                     <Index>1</Index>
@@ -10465,7 +10461,7 @@
                   </ItemState>
                   <ItemState>
                     <ItemSymbol>GetDir</ItemSymbol>
-                    <ReadOnly>false</ReadOnly>
+                    <ReadOnly>true</ReadOnly>
                     <UserReadOnly>false</UserReadOnly>
                     <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
                     <Index>1</Index>
@@ -10520,7 +10516,7 @@
                   </ItemState>
                   <ItemState>
                     <ItemSymbol>PutVal</ItemSymbol>
-                    <ReadOnly>false</ReadOnly>
+                    <ReadOnly>true</ReadOnly>
                     <UserReadOnly>false</UserReadOnly>
                     <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
                     <Index>1</Index>
@@ -10569,7 +10565,7 @@
                   </ItemState>
                   <ItemState>
                     <ItemSymbol>ConnectPin</ItemSymbol>
-                    <ReadOnly>false</ReadOnly>
+                    <ReadOnly>true</ReadOnly>
                     <UserReadOnly>false</UserReadOnly>
                     <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
                     <Index>1</Index>
@@ -10585,7 +10581,7 @@
                   </ItemState>
                   <ItemState>
                     <ItemSymbol>GetRawVal</ItemSymbol>
-                    <ReadOnly>false</ReadOnly>
+                    <ReadOnly>true</ReadOnly>
                     <UserReadOnly>false</UserReadOnly>
                     <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
                     <Index>1</Index>
@@ -14790,7 +14786,7 @@
   </Bean>
   <Bean>
     <BeanType>SynchroMaster</BeanType>
-    <Name>SM1</Name>
+    <Name>BLDCspi</Name>
     <CompNumb>49</CompNumb>
     <CompEnabled>true</CompEnabled>
     <GenCodeMode>ALWAYS_WRITE</GenCodeMode>
@@ -14805,7 +14801,7 @@
         <ItemSymbol>DeviceName</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>SM1</Value>
+        <Value>BLDCspi</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>Ser</ItemSymbol>
@@ -17060,7 +17056,7 @@
         <ItemSymbol>BeforeNewSpeedName</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>SM1_BeforeNewSpeed</Value>
+        <Value>BLDCspi_BeforeNewSpeed</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>AfterNewSpeed</ItemSymbol>
@@ -17076,7 +17072,7 @@
         <ItemSymbol>AfterNewSpeedName</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>SM1_AfterNewSpeed</Value>
+        <Value>BLDCspi_AfterNewSpeed</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>OnRxChar</ItemSymbol>
@@ -17092,7 +17088,7 @@
         <ItemSymbol>OnRxCharName</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>SM1_OnRxChar</Value>
+        <Value>BLDCspi_OnRxChar</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>OnRxCharPriority</ItemSymbol>
@@ -17114,7 +17110,7 @@
         <ItemSymbol>OnRxCharExtName</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>SM1_OnRxCharExt</Value>
+        <Value>BLDCspi_OnRxCharExt</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>OnRxCharExtPriority</ItemSymbol>
@@ -17136,7 +17132,7 @@
         <ItemSymbol>OnTxCharName</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>SM1_OnTxChar</Value>
+        <Value>BLDCspi_OnTxChar</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>OnTxCharPriority</ItemSymbol>
@@ -17158,7 +17154,7 @@
         <ItemSymbol>OnFullRxBufName</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>SM1_OnFullRxBuf</Value>
+        <Value>BLDCspi_OnFullRxBuf</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>OnFullRxBufPriority</ItemSymbol>
@@ -17180,7 +17176,7 @@
         <ItemSymbol>OnFreeTxBufName</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>SM1_OnFreeTxBuf</Value>
+        <Value>BLDCspi_OnFreeTxBuf</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>OnFreeTxBufPriority</ItemSymbol>
@@ -17202,7 +17198,7 @@
         <ItemSymbol>OnErrorName</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>SM1_OnError</Value>
+        <Value>BLDCspi_OnError</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>OnErrorPriority</ItemSymbol>
@@ -17229,7 +17225,7 @@
         <ItemSymbol>OnFaultName</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>SM1_OnFault</Value>
+        <Value>BLDCspi_OnFault</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>OnFaultPriority</ItemSymbol>
@@ -17320,7 +17316,7 @@
       </ItemState>
       <ItemState>
         <ItemSymbol>CmpInt</ItemSymbol>
-        <Value>INT_TPM1</Value>
+        <Value>INT_TPM0</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>CmpInt1</ItemSymbol>
@@ -17723,7 +17719,7 @@
               <ItemSymbol>Duty</ItemSymbol>
               <ReadOnly>false</ReadOnly>
               <UserReadOnly>false</UserReadOnly>
-              <Value>TPM1_C0V</Value>
+              <Value />
               <SharedPrphMode>false</SharedPrphMode>
             </ItemState>
             <ItemState>
@@ -17754,7 +17750,7 @@
             </ItemState>
             <ItemState>
               <ItemSymbol>CmpInt</ItemSymbol>
-              <Value>INT_TPM1</Value>
+              <Value>INT_TPM0</Value>
             </ItemState>
             <ItemState>
               <ItemSymbol>IntPriority</ItemSymbol>
@@ -18847,7 +18843,7 @@
         <ItemSymbol>Overrundevice</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>TPM1_Free</Value>
+        <Value>TPM0_Free</Value>
         <SharedPrphMode>false</SharedPrphMode>
       </ItemState>
       <ItemState>
@@ -18945,7 +18941,7 @@
       </ItemState>
       <ItemState>
         <ItemSymbol>CounterInt</ItemSymbol>
-        <Value>INT_TPM1</Value>
+        <Value>INT_TPM0</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>CounterInitPriority</ItemSymbol>
@@ -19169,7 +19165,7 @@
       </ItemState>
       <ItemState>
         <ItemSymbol>ChannelCmpIntVector0</ItemSymbol>
-        <Value>INT_TPM1</Value>
+        <Value>INT_TPM0</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>ChannelCmpIntPriority0</ItemSymbol>

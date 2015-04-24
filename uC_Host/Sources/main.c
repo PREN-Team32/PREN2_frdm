@@ -55,7 +55,7 @@
 #include "ExtIntLdd1.h"
 #include "BLDC2_IRQ.h"
 #include "ExtIntLdd2.h"
-#include "SM1.h"
+#include "BLDCspi.h"
 #include "SMasterLdd1.h"
 /* Including shared modules, which are used for whole project */
 #include "PE_Types.h"
