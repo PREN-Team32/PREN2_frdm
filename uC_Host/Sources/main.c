@@ -44,6 +44,8 @@
 #include "AS1.h"
 #include "ASerialLdd1.h"
 #include "RxBuf1.h"
+#include "BLDCspi.h"
+#include "SMasterLdd1.h"
 #include "PWM_DC.h"
 #include "PwmLdd3.h"
 #include "TU2.h"
@@ -55,8 +57,8 @@
 #include "ExtIntLdd1.h"
 #include "BLDC2_IRQ.h"
 #include "ExtIntLdd2.h"
-#include "BLDCspi.h"
-#include "SMasterLdd1.h"
+#include "Stepperspi.h"
+#include "SMasterLdd2.h"
 /* Including shared modules, which are used for whole project */
 #include "PE_Types.h"
 #include "PE_Error.h"
@@ -68,6 +70,8 @@
 #include "Error.h"
 #include "BLDC.h"
 #include "DC.h"
+#include "stepper.h"
+#include "l6480.h"
 
 
 static void Task1(void *pvParameters)
@@ -77,7 +81,6 @@ static void Task1(void *pvParameters)
 		LedGreen_Neg();
 		FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
 	}
-
 }
 
 static void Task2(void *pvParameters)
@@ -108,6 +111,7 @@ int main(void)
   set_status(STATUS_RESET);
   BLDC_init();
   DC_init();
+  init_Stepper();
   SHELL_Init();
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/

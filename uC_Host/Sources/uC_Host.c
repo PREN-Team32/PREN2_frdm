@@ -14,6 +14,7 @@
 #include "BLDC.h"
 #include "DC.h"
 #include "WAIT1.h"
+#include "l6480.h"
 
 static const CLS1_ParseCommandCallback CmdParserTable[] =
 {
@@ -36,6 +37,10 @@ static const CLS1_ParseCommandCallback CmdParserTable[] =
 
 #if DC_PARSE_COMMAND_ENABLED
 		DC_ParseCommand,
+#endif
+
+#if PL_HAS_SHELL
+		l6480_ParseCommand,
 #endif
 		NULL
 };

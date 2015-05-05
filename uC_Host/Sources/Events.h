@@ -48,6 +48,8 @@
 #include "AS1.h"
 #include "ASerialLdd1.h"
 #include "RxBuf1.h"
+#include "BLDCspi.h"
+#include "SMasterLdd1.h"
 #include "PWM_DC.h"
 #include "PwmLdd3.h"
 #include "TU2.h"
@@ -59,8 +61,8 @@
 #include "ExtIntLdd1.h"
 #include "BLDC2_IRQ.h"
 #include "ExtIntLdd2.h"
-#include "BLDCspi.h"
-#include "SMasterLdd1.h"
+#include "Stepperspi.h"
+#include "SMasterLdd2.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -216,19 +218,6 @@ void BLDCspi_OnRxChar(void);
 ** ===================================================================
 */
 
-void BLDCspi_OnTxChar(void);
-/*
-** ===================================================================
-**     Event       :  BLDCspi_OnTxChar (module Events)
-**
-**     Component   :  BLDCspi [SynchroMaster]
-**     Description :
-**         This event is called after a character is transmitted.
-**     Parameters  : None
-**     Returns     : Nothing
-** ===================================================================
-*/
-
 void BLDC2_IRQ_OnInterrupt(void);
 /*
 ** ===================================================================
@@ -252,6 +241,64 @@ void BLDC1_IRQ_OnInterrupt(void);
 **     Description :
 **         This event is called when an active signal edge/level has
 **         occurred.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+
+void Stepperspi_OnRxChar(void);
+/*
+** ===================================================================
+**     Event       :  Stepperspi_OnRxChar (module Events)
+**
+**     Component   :  Stepperspi [SynchroMaster]
+**     Description :
+**         This event is called after a correct character is received.
+**         The event is available only when the <Interrupt
+**         service/event> property is enabled.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+
+void Stepperspi_OnTxChar(void);
+/*
+** ===================================================================
+**     Event       :  Stepperspi_OnTxChar (module Events)
+**
+**     Component   :  Stepperspi [SynchroMaster]
+**     Description :
+**         This event is called after a character is transmitted.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+
+void Stepperspi_OnError(void);
+/*
+** ===================================================================
+**     Event       :  Stepperspi_OnError (module Events)
+**
+**     Component   :  Stepperspi [SynchroMaster]
+**     Description :
+**         This event is called when a channel error (not the error
+**         returned by a given method) occurs. The errors can be read
+**         using <GetError> method.
+**         The event is available only when the <Interrupt
+**         service/event> property is enabled.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+
+void BLDCspi_OnTxChar(void);
+/*
+** ===================================================================
+**     Event       :  BLDCspi_OnTxChar (module Events)
+**
+**     Component   :  BLDCspi [SynchroMaster]
+**     Description :
+**         This event is called after a character is transmitted.
 **     Parameters  : None
 **     Returns     : Nothing
 ** ===================================================================
