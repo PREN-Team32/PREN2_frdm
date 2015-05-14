@@ -59,6 +59,8 @@
 #include "ExtIntLdd2.h"
 #include "Stepperspi.h"
 #include "SMasterLdd2.h"
+#include "STP_BSY.h"
+#include "ExtIntLdd3.h"
 /* Including shared modules, which are used for whole project */
 #include "PE_Types.h"
 #include "PE_Error.h"
@@ -113,6 +115,12 @@ int main(void)
   DC_init();
   init_Stepper();
   SHELL_Init();
+
+  if (FRTOS1_xTaskCreate(Task1, "Task1", configMINIMAL_STACK_SIZE, NULL,
+                tskIDLE_PRIORITY, NULL) != pdPASS) {
+        for (;;) {
+        } /* error */
+    }
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
   /*** RTOS startup code. Macro PEX_RTOS_START is defined by the RTOS component. DON'T MODIFY THIS CODE!!! ***/

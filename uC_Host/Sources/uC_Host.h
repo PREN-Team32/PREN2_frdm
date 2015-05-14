@@ -11,4 +11,6 @@
 /*! \brief Serial driver initialization */
 void SHELL_Init(void);
 
+void shellSendDone(void);
+
 #endif /* UC_HOST_H_ */

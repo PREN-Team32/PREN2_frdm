@@ -341,6 +341,24 @@ void BLDCspi_OnTxChar(void)
   /* Write your code here ... */
 }
 
+/*
+** ===================================================================
+**     Event       :  STP_BSY_OnInterrupt (module Events)
+**
+**     Component   :  STP_BSY [ExtInt]
+**     Description :
+**         This event is called when an active signal edge/level has
+**         occurred.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+void STP_BSY_OnInterrupt(void)
+{
+  /* Write your code here ... */
+  shellSendDone();
+}
+
 /* END Events */
 
 #ifdef __cplusplus
