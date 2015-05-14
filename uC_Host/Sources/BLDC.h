@@ -18,23 +18,9 @@
 #if CS_HANDELD_BY_CODEEXPERT == 0
 #define MORE_AS_ONE_SLAVE 1
 #endif
-typedef enum
-{
-	ON,
-	OFF
-}MotorState;
 
-typedef enum
-{
-	BLDC1,
-	BLDC2
-}BldcMotors_t;
 
 void BLDC_init(void);
-
-void setMotor(BldcMotors_t m);
-uint8_t putBLDC(MotorState s);
-uint8_t setSpeed(uint16_t val);
 
 
 void BLDC_Receive_from_spi(void);

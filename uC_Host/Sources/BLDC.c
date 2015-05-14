@@ -35,18 +35,31 @@
 #define BLDC_MOTORS_MIN 0
 #define BLDC_MOTORS_MAX 1
 
-#define CMD_DUMMY		   0x00
-#define CMD_START          0x10
-#define CMD_STOP           0x20
-#define CMD_SET_RPM		   0x32
-#define CMD_SET_VOLTAGE    0x42
-#define CMD_SET_CURRENT    0x51
-#define CMD_ARE_YOU_ALIVE  0x71
-#define CMD_SET_PWM		   0x81
-#define CMD_GET_STATUS     0x64
+#define CMD_DUMMY		       0x00
+#define CMD_START              0x10
+#define CMD_STOP               0x20
+#define CMD_SET_RPM		       0x32
+#define CMD_SET_VOLTAGE        0x42
+#define CMD_SET_CURRENT        0x51
+#define CMD_ARE_YOU_ALIVE      0x71
+#define CMD_SET_PWM		       0x81
+#define CMD_GET_STATUS         0x64
+#define CMD_MEASUREMENT        0xD0
+#define CMD_MEASUREMENT_PARAM  0xC0
 
 #define I_AM_ALIVE	       0x55
 
+typedef enum
+{
+	ON,
+	OFF
+}MotorState;
+
+typedef enum
+{
+	BLDC1,
+	BLDC2
+}BldcMotors_t;
 
 typedef union
 {
@@ -105,39 +118,6 @@ void handleCS(bool en)
 #endif
 }
 
-void setMotor(BldcMotors_t m)
-{
-	Motor = m;
-}
-
-uint8_t putBLDC(MotorState s)
-{
-	if( (CS_BLDC1_GetVal() == CS_ENABLE ) || ( CS_BLDC2_GetVal() == CS_ENABLE) )
-		return 1;
-
-	if(s == ON)
-		actualCmd = CMD_START;
-	else
-		actualCmd = CMD_STOP;
-
-	handleCS(CS_ENABLE);
-	(void) BLDCspi_SendChar(actualCmd);
-	return 0;
-}
-
-uint8_t setSpeed(uint16_t val)
-{
-	if( (CS_BLDC1_GetVal() == CS_ENABLE ) || ( CS_BLDC2_GetVal() == CS_ENABLE) )
-		return 1;
-	BLDC1_Status.rpm.value = val;
-	actualCmd = CMD_SET_RPM;
-	handleCS(CS_ENABLE);
-	(void) BLDCspi_SendChar(actualCmd);
-	BLDCspi_SendChar((uint8_t)BLDC1_Status.rpm.byte.high);
-	BLDCspi_SendChar((uint8_t)BLDC1_Status.rpm.byte.low);
-	return 0;
-}
-
 static uint8_t PrintStatus(const CLS1_StdIOType *io)
 {
 	unsigned char rpm_message[40] = { '\0' };
@@ -187,13 +167,13 @@ static uint8_t PrintHelp(const CLS1_StdIOType *io)
 	CLS1_SendHelpStr((unsigned char*)"  use n ",
 			 (unsigned char*)"select the configurable motor\r\n",
 			 io->stdOut);
-	CLS1_SendHelpStr((unsigned char*)"  all on ",
-			 (unsigned char*)"starts all BLDC motors\r\n",
-			 io->stdOut);
-	CLS1_SendHelpStr((unsigned char*)"  all off ",
-			 (unsigned char*)"stops all BLDC motors\r\n",
-			 io->stdOut);
 #endif
+	CLS1_SendHelpStr((unsigned char*)"  initmeasurement ",
+			 (unsigned char*)"initialize the measurement\r\n",
+			 io->stdOut);
+	CLS1_SendHelpStr((unsigned char*)"  startmeasurement ",
+			 (unsigned char*)"start a measurement with a step\r\n",
+			 io->stdOut);
 	return ERR_OK;
 }
 
@@ -214,6 +194,22 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 	{
 		*handled = TRUE;
 		actualCmd = CMD_GET_STATUS;
+		handleCS(CS_ENABLE);
+		(void) BLDCspi_SendChar(actualCmd);
+		return ERR_OK;
+	}
+	else if (UTIL1_strcmp((char*)cmd, "BLDC initmeasurement") == 0)
+	{
+		*handled = TRUE;
+		actualCmd = CMD_MEASUREMENT_PARAM;
+		handleCS(CS_ENABLE);
+		(void) BLDCspi_SendChar(actualCmd);
+		return ERR_OK;
+	}
+	else if (UTIL1_strcmp((char*)cmd, "BLDC startmeasurement") == 0)
+	{
+		*handled = TRUE;
+		actualCmd = CMD_MEASUREMENT;
 		handleCS(CS_ENABLE);
 		(void) BLDCspi_SendChar(actualCmd);
 		return ERR_OK;
@@ -327,29 +323,6 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 			sprintf(message, "Wrong argument, must be in range %i to %i", BLDC_MOTORS_MIN, BLDC_MOTORS_MAX);
 			CLS1_SendStr((unsigned char*)message, io->stdErr);
 		}
-	}else if (UTIL1_strcmp((char*)cmd, "BLDC all on") == 0)
-	{
-		*handled = TRUE;
-		setMotor(BLDC1);
-		setSpeed(60000);
-		WAIT1_Waitus(5);
-		putBLDC(ON);
-		WAIT1_Waitus(5);
-		setMotor(BLDC2);
-		setSpeed(60000);
-		WAIT1_Waitus(5);
-		putBLDC(ON);
-		WAIT1_Waitus(5);
-		return ERR_OK;
-	}else if (UTIL1_strcmp((char*)cmd, "BLDC all off") == 0)
-	{
-		*handled = TRUE;
-		setMotor(BLDC1);
-		putBLDC(OFF);
-		WAIT1_Waitus(5);
-		setMotor(BLDC2);
-		putBLDC(OFF);
-		return ERR_OK;
 	}
 #endif
 	return ERR_OK;
