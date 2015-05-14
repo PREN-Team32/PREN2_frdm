@@ -3,8 +3,8 @@
   <Header>
     <Name>uC_Host</Name>
     <SavedBy>studer.yves</SavedBy>
-    <ModificationStamp>101</ModificationStamp>
-    <Date>2015-05-01</Date>
+    <ModificationStamp>102</ModificationStamp>
+    <Date>2015-05-14</Date>
     <IDE>Eclipse IDE</IDE>
     <PEversion>1.10.1.RT6_b1444-1070</PEversion>
   </Header>
@@ -4989,7 +4989,7 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>40</Value>
+        <Value>150</Value>
         <Base>DEC</Base>
       </ItemState>
       <ItemState>
@@ -5233,7 +5233,7 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>2048</Value>
+        <Value>8000</Value>
         <Base>DEC</Base>
       </ItemState>
       <ItemState>
