@@ -43,6 +43,7 @@
 #define CMD_SET_CURRENT        0x51
 #define CMD_ARE_YOU_ALIVE      0x71
 #define CMD_SET_PWM		       0x81
+#define CMD_PLAY_SOUND	       0x90
 #define CMD_GET_STATUS         0x64
 #define CMD_MEASUREMENT        0xD0
 #define CMD_MEASUREMENT_PARAM  0xC0
@@ -174,6 +175,9 @@ static uint8_t PrintHelp(const CLS1_StdIOType *io)
 	CLS1_SendHelpStr((unsigned char*)"  startmeasurement ",
 			 (unsigned char*)"start a measurement with a step\r\n",
 			 io->stdOut);
+	CLS1_SendHelpStr((unsigned char*)"  sound ",
+			 (unsigned char*)"start playing sound with the motor\r\n",
+			 io->stdOut);
 	return ERR_OK;
 }
 
@@ -235,6 +239,14 @@ byte BLDC_ParseCommand(const unsigned char *cmd, bool *handled, const CLS1_StdIO
 		BLDCspi_TComData tmp;
 		*handled = TRUE;
 		actualCmd = CMD_ARE_YOU_ALIVE;
+		handleCS(CS_ENABLE);
+		(void) BLDCspi_SendChar(actualCmd);
+		return ERR_OK;
+	}
+	else if (UTIL1_strcmp((char*)cmd, "BLDC sound") == 0)
+	{
+		*handled = TRUE;
+		actualCmd = CMD_PLAY_SOUND;
 		handleCS(CS_ENABLE);
 		(void) BLDCspi_SendChar(actualCmd);
 		return ERR_OK;
