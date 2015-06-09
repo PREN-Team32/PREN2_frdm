@@ -32,6 +32,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>Sources/BLDC</name>
+			<type>2</type>
+			<location>C:/Users/studer.yves/Documents/GitHub/PREN_ET/frdm/PREN_ET/Sources/BLDC</location>
+		</link>
+		<link>
 			<name>Sources/stepper_drv</name>
 			<type>2</type>
 			<location>C:/Users/studer.yves/Documents/GitHub/stepper/driver/drv</location>
